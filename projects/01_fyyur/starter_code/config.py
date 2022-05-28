@@ -10,4 +10,7 @@ DEBUG = True
 
 
 # TODO IMPLEMENT DATABASE URL
-SQLALCHEMY_DATABASE_URI = '<Put your local database url>'
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:opensesame@localhost:5432/fyyur'
+
+#Disable alerts to app on db changes
+SQLALCHEMY_TRACK_MODIFICATIONS = False
