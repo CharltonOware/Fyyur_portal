@@ -45,6 +45,7 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean, default=False, nullable=False)
     seeking_description = db.Column(db.String(),nullable=True)
     genres = db.Column(db.ARRAY(db.String()))
+    website_link = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate .DONE
     #Add __repr__
@@ -232,20 +233,32 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
+  # TODO: insert form data as a new Venue record in the db, instead . DONE
   # TODO: modify data to be the data object returned from db insertion
   try:
-    name = request.form.get('name')
-    city = request.form.get('city')
-    state = request.form.get('state')
-    address = request.form.get('address')
-    phone = request.form.get('phone')
-    seeking_talent = request.form.get('seeking_talent')
+    form = VenueForm(request.form)
+    if form.validate():
+      name = form.name.data
+      city = form.city.data
+      state = form.state.data
+      address = form.address.data
+      phone = form.phone.data
+      seeking_talent = form.seeking_talent.data
+      image_link = form.image_link.data
+      genres = form.genres.data
+      facebook_link = form.facebook_link.data
+      website_link = form.website_link.data
+      seeking_description = form.seeking_description.data
 
-    venue = Venue(name=name, city=city, state=state, address=address, phone=phone, seeking_talent=seeking_talent)
 
-    db.session.add(venue)
-    db.session.commit()
+      venue = Venue(name=name, city=city, state=state, address=address,
+        phone=phone, image_link=image_link, genres=genres, 
+        facebook_link=facebook_link, website_link=website_link,
+        seeking_talent=seeking_talent, seeking_description=seeking_description
+        )
+
+      db.session.add(venue)
+      db.session.commit()
     # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
   except:
