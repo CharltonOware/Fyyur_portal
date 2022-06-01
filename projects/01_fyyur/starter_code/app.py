@@ -11,7 +11,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
+from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 from forms import *
 from config import *
@@ -24,6 +24,7 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+csrf = CSRFProtect(app)
 
 # TODO: connect to a local postgresql database - DONE
 
@@ -236,9 +237,9 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead . DONE
   # TODO: modify data to be the data object returned from db insertion
-  form = VenueForm(request.form)
-  
-  if form.validate_on_submit():
+  form = VenueForm()
+  #if form.validate_on_submit():
+  try:
     name = form.name.data
     city = form.city.data
     state = form.state.data
@@ -250,7 +251,6 @@ def create_venue_submission():
     facebook_link = form.facebook_link.data
     website_link = form.website_link.data
     seeking_description = form.seeking_description.data
-
 
     venue = Venue(name=name, city=city, state=state, address=address,
       phone=phone, image_link=image_link, genres=genres, 
@@ -265,12 +265,12 @@ def create_venue_submission():
       # TODO: on unsuccessful db insert, flash an error instead.
       # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
       # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  else:
+  except:
     db.session.rollback()
     flash('An error occurred.Venue '+ str(form['name']) + ' could not be listed.')
     print(sys.exc_info())
-  
-  db.session.close()
+  finally:
+    db.session.close()
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -459,11 +459,28 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  form = ArtistForm()
+  try:
+    name = form.name.data
+    city = form.city.data
+    state = form.state.data
+    phone = form.phone.data
+    genres = form.genres.data
+    seeking_venue = form.seeking_venue.data
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+    artist = Artist(name=name, city=city, state=state, phone=phone,
+                genres=genres, seeking_venue=seeking_venue)
+
+    db.session.add(artist)
+    db.session.commit()
+    # on successful db insert, flash success
+    flash('Artist ' + request.form['name'] + ' was successfully listed!')
+  except:
+    db.session.rollback()
+    flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+    print(sys.exc_info())
+  finally:
+    db.session.close() 
   return render_template('pages/home.html')
 
 
