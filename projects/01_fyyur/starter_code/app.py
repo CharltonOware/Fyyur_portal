@@ -120,8 +120,6 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
   areas = Venue.query.distinct(Venue.city, Venue.state).all()
   data = []
   for area in areas:
@@ -132,10 +130,13 @@ def venues():
     venues = Venue.query.filter_by(city=area.city, state=area.state).all()
     new_venues = []
     for venue in venues:
+      #count the rows having venue_id matching this venue's id and the start_time is a time greater than this insant
+      upcoming_shows = Show.query.filter_by(venue_id=venue.id).filter(Show.start_time > datetime.now()).all()
+      num_upcoming_shows = len(upcoming_shows)
       new_venues.append({
         'id': venue.id,
         'name': venue.name,
-        #'num_upcoming_shows': 
+        'num_upcoming_shows': num_upcoming_shows
       })
       #insert new venues into the area_data dictionary object
       area_data['venues'] = new_venues
@@ -161,23 +162,43 @@ def search_venues():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   venue = Venue.query.filter_by(id=venue_id).first()
-  # data2={
-  #   "id": 2,
-  #   "name": "The Dueling Pianos Bar",
-  #   "genres": ["Classical", "R&B", "Hip-Hop"],
-  #   "address": "335 Delancey Street",
-  #   "city": "New York",
-  #   "state": "NY",
-  #   "phone": "914-003-1132",
-  #   "website": "https://www.theduelingpianos.com",
-  #   "facebook_link": "https://www.facebook.com/theduelingpianos",
-  #   "seeking_talent": False,
-  #   "image_link": "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
-  #   "past_shows": [],
-  #   "upcoming_shows": [],
-  #   "past_shows_count": 0,
-  #   "upcoming_shows_count": 0,
-  # }
+  shows = Show.query.filter_by(venue_id=venue.id).all()
+  upcoming_shows = []
+  past_shows = []
+  for show in shows:
+    if show.start_time > datetime.now():
+      upcoming_shows.append({
+        #object.backref.attribute
+        "artist_name": show.artist.name,
+        "artist_image_link": show.artist.image_link,
+        "start_time": show.start_time
+      })
+    if show.start_time < datetime.now():
+      past_shows.append({
+        "artist_name": show.artist.name,
+        "artist_image_link": show.artist.image_link,
+        "start_time": show.start_time
+      })
+  upcoming_shows_count = len(upcoming_shows)
+  past_shows_count = len(past_shows)
+
+  venue={
+    "id": venue.id,
+    "name": venue.name,
+    "genres": venue.genres,
+    "address": venue.address,
+    "city": venue.city,
+    "state": venue.state,
+    "phone": venue.phone,
+    "website": venue.website_link,
+    "facebook_link": venue.facebook_link,
+    "seeking_talent": venue.seeking_talent,
+    "image_link": venue.image_link,
+    "past_shows": past_shows,
+    "upcoming_shows": upcoming_shows,
+    "past_shows_count": past_shows_count,
+    "upcoming_shows_count": upcoming_shows_count,
+  }
   
   return render_template('pages/show_venue.html', venue=venue)
 
@@ -395,7 +416,6 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
-  # TODO: replace with real venues data.
   show_data = []
   shows = Show.query.all()
   for show in shows:
@@ -421,7 +441,6 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
   form = ShowForm()
   try:
     show = Show(
