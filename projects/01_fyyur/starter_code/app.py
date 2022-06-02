@@ -73,8 +73,6 @@ class Artist(db.Model):
 
 #db.create_all()
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-
 class Show(db.Model):
   __tablename__ = 'shows'
 
@@ -161,7 +159,8 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
-  shows = Show.query.filter_by(venue_id=venue_id).all()
+  venue = Venue.query.filter_by(id=venue_id).first()
+  shows = Show.query.filter_by(venue_id=venue.id).all()
   upcoming_shows = []
   past_shows = []
   for show in shows:
@@ -181,18 +180,18 @@ def show_venue(venue_id):
   upcoming_shows_count = len(upcoming_shows)
   past_shows_count = len(past_shows)
 
-  venue={
-    "id": show.venue.id,
-    "name": show.venue.name,
-    "genres": show.venue.genres,
-    "address": show.venue.address,
-    "city": show.venue.city,
-    "state": show.venue.state,
-    "phone": show.venue.phone,
-    "website": show.venue.website_link,
-    "facebook_link": show.venue.facebook_link,
-    "seeking_talent": show.venue.seeking_talent,
-    "image_link": show.venue.image_link,
+  venue = {
+    "id": venue.id,
+    "name": venue.name,
+    "genres": venue.genres,
+    "address": venue.address,
+    "city": venue.city,
+    "state": venue.state,
+    "phone": venue.phone,
+    "website": venue.website_link,
+    "facebook_link": venue.facebook_link,
+    "seeking_talent": venue.seeking_talent,
+    "image_link": venue.image_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
     "past_shows_count": past_shows_count,
@@ -271,7 +270,21 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
+  search_term = "%{0}%".format(request.form['search_term'])
+  artists = Artist.query.filter(Artist.name.ilike(search_term)).all()
+  data = []
+  for artist in artists:
+    artist_data = {
+      "id": artist.id,
+      "name": artist.name,
+     # "num_upcoming_shows": 
+    }
+    data.append(artist_data)
+  response = {
+    "count": len(artists),
+    "data": data
+  }
+  response_={
     "count": 1,
     "data": [{
       "id": 4,
@@ -284,7 +297,7 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   # shows the artist page with the given artist_id
-  artist = Artist.query.filter_by(id=artist_id).first()
+  #artist = Artist.query.filter_by(id=artist_id).first()
   shows = Show.query.filter_by(artist_id=artist_id).all()
   upcoming_shows = []
   past_shows = []
@@ -333,7 +346,7 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  form = ArtistForm(request.form)
+  form = ArtistForm()
   artist = Artist.query.get(artist_id)
   
   try:
@@ -363,26 +376,12 @@ def edit_artist_submission(artist_id):
 def edit_venue(venue_id):
   form = VenueForm()
   venue = Venue.query.get(venue_id)
-  # venue={
-  #   "id": 1,
-  #   "name": "The Musical Hop",
-  #   "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-  #   "address": "1015 Folsom Street",
-  #   "city": "San Francisco",
-  #   "state": "CA",
-  #   "phone": "123-123-1234",
-  #   "website": "https://www.themusicalhop.com",
-  #   "facebook_link": "https://www.facebook.com/TheMusicalHop",
-  #   "seeking_talent": True,
-  #   "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-  #   "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-  # }
-  # TODO: populate form with values from venue with ID <venue_id>
+  
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
+  # Take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
   form = VenueForm()
   venue = Venue.query.get(venue_id)
