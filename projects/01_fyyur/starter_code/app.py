@@ -161,8 +161,7 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
-  venue = Venue.query.filter_by(id=venue_id).first()
-  shows = Show.query.filter_by(venue_id=venue.id).all()
+  shows = Show.query.filter_by(venue_id=venue_id).all()
   upcoming_shows = []
   past_shows = []
   for show in shows:
@@ -183,17 +182,17 @@ def show_venue(venue_id):
   past_shows_count = len(past_shows)
 
   venue={
-    "id": venue.id,
-    "name": venue.name,
-    "genres": venue.genres,
-    "address": venue.address,
-    "city": venue.city,
-    "state": venue.state,
-    "phone": venue.phone,
-    "website": venue.website_link,
-    "facebook_link": venue.facebook_link,
-    "seeking_talent": venue.seeking_talent,
-    "image_link": venue.image_link,
+    "id": show.venue.id,
+    "name": show.venue.name,
+    "genres": show.venue.genres,
+    "address": show.venue.address,
+    "city": show.venue.city,
+    "state": show.venue.state,
+    "phone": show.venue.phone,
+    "website": show.venue.website_link,
+    "facebook_link": show.venue.facebook_link,
+    "seeking_talent": show.venue.seeking_talent,
+    "image_link": show.venue.image_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
     "past_shows_count": past_shows_count,
@@ -286,6 +285,40 @@ def search_artists():
 def show_artist(artist_id):
   # shows the artist page with the given artist_id
   artist = Artist.query.filter_by(id=artist_id).first()
+  shows = Show.query.filter_by(artist_id=artist_id).all()
+  upcoming_shows = []
+  past_shows = []
+  for show in shows:
+    if show.start_time > datetime.now():
+      upcoming_shows.append({
+        'venue_name': show.venue.name,
+        'venue_image_link': show.venue.image_link,
+        'start_time': show.start_time
+      })
+    if show.start_time < datetime.now():
+      past_shows.append({
+        'venue_name': show.venue.name,
+        'venue_image_link': show.venue.image_link,
+        'start_time': show.start_time
+      })
+  upcoming_shows_count = len(upcoming_shows)
+  past_shows_count = len(past_shows)
+
+  artist = {
+    "id": show.artist.id,
+    "name": show.artist.name,
+    "genres": show.artist.genres,
+    "city": show.artist.city,
+    "state": show.artist.state,
+    "phone": show.artist.phone,
+    "facebook_link": show.artist.facebook_link,
+    "seeking_venue": show.artist.seeking_venue,
+    "image_link": show.artist.image_link,
+    "past_shows": past_shows,
+    "upcoming_shows": upcoming_shows,
+    "past_shows_count": past_shows_count,
+    "upcoming_shows_count": upcoming_shows_count,
+  }
   #data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
   return render_template('pages/show_artist.html', artist=artist)
 
