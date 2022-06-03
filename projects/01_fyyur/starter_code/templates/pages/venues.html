@@ -1,5 +1,8 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Fyyur | Venues{% endblock %}
+<style>
+	li 
+</style> 
 {% block content %}
 {% for area in areas %}
 <h3>{{ area.city }}, {{ area.state }}</h3>
@@ -12,6 +15,9 @@
 					<h5>{{ venue.name }}</h5>
 				</div>
 			</a>
+			<form action="{{url_for('delete_venue',venue_id=venue.id)}}" class="inline-form" method="post">
+				<button type="submit" name="delete" value="Delete" class="delete-button" data-id="{{ venue.id}}" onclick="return confirm('Would you like to proceed?')">&cross;</button>
+			</form>	
 		</li>
 		{% endfor %}
 	</ul>

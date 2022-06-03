@@ -9,6 +9,8 @@ import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+#from sqlalchemy import ForeignKey
 import logging
 from logging import Formatter, FileHandler
 from flask_migrate import Migrate
@@ -141,9 +143,7 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-  # TODO: implement search on venues with partial string search. Ensure it is case-insensitive.
-  # seach for Hop should return "The Musical Hop".
-  # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+  # implement search on venues with partial string search. Ensure it is case-insensitive.
   search_term = "%{0}%".format(request.form['search_term'])
   venues = Venue.query.filter(Venue.name.ilike(search_term)).all()
   data = []
@@ -243,15 +243,18 @@ def create_venue_submission():
     db.session.close()
   return render_template('pages/home.html')
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<venue_id>', methods=['POST'])#use post method when submitting via HTML
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-  venue = Venue.query.get(venue_id)
+  # Complete this endpoint for taking a venue_id, and using
+  # SQLAlchemy ORM to delete a record.
+  venue = Venue.query.filter_by(id=venue_id).first()
   try:
+    #Using session.merge to handle error that kept popping up as below when I refactor models to models.py
+    #<class 'sqlalchemy.exc.InvalidRequestError'>, InvalidRequestError("Object '<Venue at 0x7f1d74376390>' is already attached to session '3' (this is '4')
+    venue = db.session.merge(venue)
     db.session.delete(venue)
     db.session.commit()
-    flash('Venue ' + venue.name + ' successfully deleted.')
+    flash('Venue successfully deleted.')
   except:
     db.session.rollback()
     flash('Delete action unsuccessful!')
@@ -259,9 +262,7 @@ def delete_venue(venue_id):
   finally:
     db.session.close()
 
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  return redirect(url_for('index'))
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -293,8 +294,8 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   # shows the artist page with the given artist_id
-  #artist = Artist.query.filter_by(id=artist_id).first()
-  shows = Show.query.filter_by(artist_id=artist_id).all()
+  artist = Artist.query.filter_by(id=artist_id).first()
+  shows = Show.query.filter_by(artist_id=artist.id).all()
   upcoming_shows = []
   past_shows = []
   for show in shows:
@@ -314,15 +315,15 @@ def show_artist(artist_id):
   past_shows_count = len(past_shows)
 
   artist = {
-    "id": show.artist.id,
-    "name": show.artist.name,
-    "genres": show.artist.genres,
-    "city": show.artist.city,
-    "state": show.artist.state,
-    "phone": show.artist.phone,
-    "facebook_link": show.artist.facebook_link,
-    "seeking_venue": show.artist.seeking_venue,
-    "image_link": show.artist.image_link,
+    "id": artist.id,
+    "name": artist.name,
+    "genres": artist.genres,
+    "city": artist.city,
+    "state": artist.state,
+    "phone": artist.phone,
+    "facebook_link": artist.facebook_link,
+    "seeking_venue": artist.seeking_venue,
+    "image_link": artist.image_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
     "past_shows_count": past_shows_count,
