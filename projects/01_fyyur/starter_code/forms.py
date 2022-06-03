@@ -1,9 +1,11 @@
 from email import message
-import re
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
+from wtforms_alchemy import QuerySelectMultipleField
 from wtforms.validators import DataRequired, AnyOf, URL, Regexp
+#from models import Genre, db
+
 
 class ShowForm(FlaskForm):
     artist_id = StringField(
@@ -115,6 +117,11 @@ class VenueForm(FlaskForm):
             ('Other', 'Other'),
         ]
     )
+    # genres = QuerySelectMultipleField(
+    #     'genres',query_factory=db.Genres.fetch_genres,
+    #         get_pk= lambda a: a,
+    #         get_label= lambda a: a
+    # )
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
     )
@@ -203,6 +210,7 @@ class ArtistForm(FlaskForm):
         'image_link'
     )
     genres = SelectMultipleField(
+        # TODO implement enum restriction
         'genres', validators=[DataRequired()],
         choices=[
             ('Alternative', 'Alternative'),
@@ -226,8 +234,12 @@ class ArtistForm(FlaskForm):
             ('Other', 'Other'),
         ]
      )
+    # genres = QuerySelectMultipleField(
+    #     'genres',query_factory= db.Genres.fetch_genres,
+    #         get_pk= lambda a: a,
+    #         get_label= lambda a: a
+    # )
     facebook_link = StringField(
-        # TODO implement enum restriction
         'facebook_link', validators=[URL()]
      )
 

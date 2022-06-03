@@ -1,6 +1,35 @@
 from datetime import datetime
-from sqlalchemy import ForeignKey
-from app import db
+from sqlalchemy import ForeignKey, Enum
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+#Define Genres class for Enum restriction
+# class Genres(Enum):
+#   ALTERNATIVE = 'Alternative'
+#   BLUES = 'Blues'
+#   CLASSICAL = 'Classical'
+#   COUNTRY = 'Country'
+#   ELECTRONIC = 'Electronic'
+#   FOLK = 'Folk'
+#   FUNK = 'Funk'
+#   JAZZ = 'Jazz'
+#   REGGAE = 'Reggae'
+#   HIP_HOP = 'Hip-hop'
+#   HEAVY_METAL = 'Heavy metal'
+#   INSTRUMENTAL = 'Instrumental'
+#   MUSICAL_THEATRE = 'Musical theatre'
+#   ROCK_N_ROLL = 'Rock n roll'
+#   POP = 'Pop'
+#   PUNK = 'Punk'
+#   RNB = 'R&B'
+#   SOUL = 'Soul'
+#   OTHER = 'Other'
+
+#   @staticmethod
+#   def fetch_genres():
+#     for genre in Genres:
+#       return genre.value
 
 
 #Define model Venue
@@ -19,6 +48,7 @@ class Venue(db.Model):
   seeking_talent = db.Column(db.Boolean, default=False, nullable=False)
   seeking_description = db.Column(db.String(),nullable=True)
   genres = db.Column(db.ARRAY(db.String()))
+  #genres = db.Column(db.Enum(Genres, values_callable=lambda x: [genre.value for genre in Genres]))
   website_link = db.Column(db.String(120))
   shows = db.relationship('Show',backref='venue', lazy=True)
 
@@ -37,6 +67,8 @@ class Artist(db.Model):
   state = db.Column(db.String(120))
   phone = db.Column(db.String(120))
   genres = db.Column(db.String(120))
+  # genres = db.Column(db.Enum(Genres, 
+  #   values_callable=lambda x: [genre.value for genre in Genres]))
   image_link = db.Column(db.String(500))
   facebook_link = db.Column(db.String(120))
   seeking_venue = db.Column(db.Boolean, default=False, nullable=False)
