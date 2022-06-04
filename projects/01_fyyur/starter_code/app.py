@@ -8,9 +8,7 @@ import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
-#from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-#from sqlalchemy import ForeignKey
 import logging
 from logging import Formatter, FileHandler
 from flask_migrate import Migrate
@@ -159,7 +157,6 @@ def create_venue_form():
 def create_venue_submission():
   form = VenueForm()
   if form.validate_on_submit():
-  #try:
     venue = Venue(name=form.name.data, 
       city=form.city.data, 
       state=form.state.data, 
@@ -178,11 +175,9 @@ def create_venue_submission():
     # on successful db insert, flash success
     flash('Venue ' + str(form['name']) + ' was successfully listed!')
   else:
-  #except:
     db.session.rollback()
     flash('An error occurred.Venue '+ str(form['name']) + ' could not be listed.')
     print(sys.exc_info())
-  #finally:
   db.session.close()
   return render_template('pages/home.html')
 
@@ -289,7 +284,6 @@ def edit_artist_submission(artist_id):
   form = ArtistForm()
   artist = Artist.query.get(artist_id)
   if form.validate_on_submit():
-  #try:
     artist.name = form.name.data
     artist.city = form.city.data
     artist.state = form.state.data
@@ -305,11 +299,9 @@ def edit_artist_submission(artist_id):
     db.session.commit()
     flash('Artist' + str(form['name']) + ' successfully edited.')
   else:
-  #except:
     db.session.rollback()
     flash('Sorry, artist' + str(form['name']) + 'could not be updated.')
     print(sys.exc_info())
-  #finally:
   db.session.close()
   return redirect(url_for('show_artist', artist_id=artist_id))
 
@@ -327,7 +319,6 @@ def edit_venue_submission(venue_id):
   form = VenueForm()
   venue = Venue.query.get(venue_id)
   if form.validate_on_submit():
-  #try:
     venue.name = form.name.data
     venue.genres = form.genres.data
     venue.address = form.address.data
@@ -344,11 +335,9 @@ def edit_venue_submission(venue_id):
     db.session.commit()
     flash('Venue ' + str(form['name']) + ' updated successfully.')
   else:
-  #except:
     db.session.rollback()
     flash('Venue' + str(form['name']) + 'could not be updated.')
     print(sys.exc_info())
-  #finally:
   db.session.close()
   return redirect(url_for('show_venue', venue_id=venue_id))
 
@@ -365,7 +354,6 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   form = ArtistForm()
   if form.validate_on_submit():
-  #try:
     artist = Artist(name=form.name.data, 
         city=form.city.data, 
         state=form.state.data, 
@@ -378,11 +366,9 @@ def create_artist_submission():
     # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
   else:
-  #except:
     db.session.rollback()
     flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
     print(sys.exc_info())
-  #finally:
   db.session.close() 
   return render_template('pages/home.html')
 
