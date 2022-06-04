@@ -15,7 +15,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_migrate import Migrate
 from forms import *
-from config import *
+from config import BaseConfig
 from models import Venue, Show, Artist, db
 #----------------------------------------------------------------------------#
 # App Config.
@@ -23,7 +23,7 @@ from models import Venue, Show, Artist, db
 
 app = Flask(__name__)
 moment = Moment(app)
-app.config.from_object('config')
+app.config.from_object(BaseConfig)
 db.init_app(app)
 migrate = Migrate(app, db)
 
