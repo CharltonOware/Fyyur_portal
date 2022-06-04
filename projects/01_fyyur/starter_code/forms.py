@@ -126,7 +126,7 @@ class VenueForm(FlaskForm):
         'facebook_link', validators=[URL()]
     )
     website_link = StringField(
-        'website_link'
+        'website_link',validators=[URL()]
     )
 
     seeking_talent = BooleanField( 'seeking_talent' ) #If a default of True were required, I would use default='checked' 
@@ -244,7 +244,7 @@ class ArtistForm(FlaskForm):
      )
 
     website_link = StringField(
-        'website_link'
+        'website_link',validators=[URL()]
      )
 
     seeking_venue = BooleanField( 'seeking_venue' )

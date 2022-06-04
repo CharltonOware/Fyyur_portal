@@ -260,6 +260,7 @@ def show_artist(artist_id):
     "state": artist.state,
     "phone": artist.phone,
     "facebook_link": artist.facebook_link,
+    "website": artist.website_link,
     "seeking_venue": artist.seeking_venue,
     "image_link": artist.image_link,
     "past_shows": past_shows,

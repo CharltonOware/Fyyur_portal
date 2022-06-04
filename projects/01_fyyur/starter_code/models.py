@@ -44,12 +44,12 @@ class Venue(db.Model):
   address = db.Column(db.String(120),nullable=False)
   phone = db.Column(db.String(120))
   image_link = db.Column(db.String(500))
-  facebook_link = db.Column(db.String(120))
+  facebook_link = db.Column(db.String(120), nullable=False)
   seeking_talent = db.Column(db.Boolean, default=False, nullable=False)
   seeking_description = db.Column(db.String(),nullable=True)
   genres = db.Column(db.ARRAY(db.String()),nullable=False)
   #genres = db.Column(db.Enum(Genres, values_callable=lambda x: [genre.value for genre in Genres]))
-  website_link = db.Column(db.String(120))
+  website_link = db.Column(db.String(120), nullable=False)
   shows = db.relationship('Show',backref='venue', passive_deletes=True, lazy=True)
 
   #Add __repr__
@@ -70,7 +70,8 @@ class Artist(db.Model):
   # genres = db.Column(db.Enum(Genres, 
   #   values_callable=lambda x: [genre.value for genre in Genres]))
   image_link = db.Column(db.String(500))
-  facebook_link = db.Column(db.String(120))
+  facebook_link = db.Column(db.String(120), nullable=False)
+  website_link = db.Column(db.String(120), nullable=False)
   seeking_venue = db.Column(db.Boolean, default=False, nullable=False)
   shows = db.relationship('Show',backref='artist', passive_deletes=True, lazy=True)
 
