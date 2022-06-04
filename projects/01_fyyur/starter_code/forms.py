@@ -87,7 +87,10 @@ class VenueForm(FlaskForm):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        # implement validation logic for US phone numbers
+        'phone',validators=[DataRequired(),
+        Regexp(r"^(\([0-9]{3}\) ?|[0-9]{3}-)[0-9]{3}-[0-9]{4}$"
+        ,message="Please use the format 000-000-0000")]
     )
     image_link = StringField(
         'image_link'
