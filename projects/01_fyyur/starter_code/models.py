@@ -50,7 +50,7 @@ class Venue(db.Model):
   genres = db.Column(db.ARRAY(db.String()),nullable=False)
   #genres = db.Column(db.Enum(Genres, values_callable=lambda x: [genre.value for genre in Genres]))
   website_link = db.Column(db.String(120))
-  shows = db.relationship('Show',backref='venue', lazy=True)
+  shows = db.relationship('Show',backref='venue', passive_deletes=True, lazy=True)
 
   #Add __repr__
   def __repr__(self):
@@ -72,7 +72,7 @@ class Artist(db.Model):
   image_link = db.Column(db.String(500))
   facebook_link = db.Column(db.String(120))
   seeking_venue = db.Column(db.Boolean, default=False, nullable=False)
-  shows = db.relationship('Show',backref='artist',lazy=True)
+  shows = db.relationship('Show',backref='artist', passive_deletes=True, lazy=True)
 
 
   def __repr__(self):
